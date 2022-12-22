@@ -23,20 +23,19 @@ global potentialFixation
 def calculateFixationPoint(thisFixation):
     numerator = np.array([])
     denominator = np.array([])
-    # implementing weighted average formula
-    print(f"fixation:{thisFixation}")
-    for i in range(0, thisFixation.size//2):
-        weighted = np.multiply(thisFixation[i], i+1)
-        numerator = np.append(numerator, weighted)
-        denominator = np.append(denominator, i+1)
+    i = 0
+    for multiplier in range(1, (thisFixation.size//2)+1):
+        size = range(1,thisFixation.size//2)
+        numerator = np.append(numerator, np.multiply(thisFixation[i], multiplier))
+        numerator = np.append(numerator, np.multiply(thisFixation[i+1], multiplier))
+        denominator = np.append(denominator, multiplier)
+        i = i+2
 
-    xSum = numerator[::2].copy().sum()
-    ySum = numerator[1::2].copy().sum()
-    divisor = denominator.sum()
-    # calculating x and y values
-    x = xSum/divisor
-    y = ySum/divisor
-
+    numX = numerator[::2].sum()
+    numY = numerator[1::2].sum()
+    denominator = denominator.sum()
+    x = numX/denominator
+    y = numY/denominator
 
     return x, y
 
@@ -73,7 +72,7 @@ def filterPoint(point):
     global currentFixation
     global potentialFixation
 
-    point = np.array(point)
+    point = np.array([point])
     if isEmpty(currentFixation):
         currentFixation = np.append(currentFixation, point)
         return
@@ -83,6 +82,7 @@ def filterPoint(point):
             distance = calculateDistance(np.array([currentFixationPoint]), point)
             if distance < SACCADE_THRESHOLD:
                 addPoint(point, "current")
+                # TODO Error starts Here
                 currentFixationPoint = calculateFixationPoint(currentFixation)
                 return currentFixationPoint
             else:
@@ -121,8 +121,8 @@ def filterPoint(point):
 def main():
     global currentFixation
     global potentialFixation
-    point = [2, 3]
-    currentFixation = np.array([[1, 2], [2, 3]])
+    point = [3, 4]
+    currentFixation = np.array([1, 2, 2, 3])
     potentialFixation = np.array([])
 
     print(f"calculated point\n{filterPoint(point)}")
