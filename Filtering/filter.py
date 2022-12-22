@@ -4,13 +4,13 @@
 
 # Imports --------------------------------------------------------------------------------------------------------------
 import numpy as np
-
+import csv
 # Constants ------------------------------------------------------------------------------------------------------------
 
 # The maximum allowable distance from a previous point before it is interpreted as a saccade
-SACCADE_THRESHOLD = 2
+SACCADE_THRESHOLD = 10
 # The number of points used in the fixation point calculation
-WINDOW_LENGTH = 4
+WINDOW_LENGTH = 3
 
 # Globals --------------------------------------------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ def filterPoint(point):
                 addPoint(point, "potential")
                 return currentFixationPoint
         else:
-            potentialFixationPoint = calculateFixationPoint(potentialFixation)
+            potentialFixationPoint = potentialFixation
             distanceToCF = calculateDistance(np.array([currentFixationPoint]), point)
             distanceToPF = calculateDistance(np.array([potentialFixationPoint]), point)
 
@@ -121,15 +121,38 @@ def filterPoint(point):
 def main():
     global currentFixation
     global potentialFixation
-    point = [3, 4]
-    currentFixation = np.array([1, 2, 2, 3, 3,4])
+    filename = "eyeData.csv"
+    fields = []
+    rows = []
+
+    with open(filename, "r") as csvfile:
+        csvreader = csv.reader(csvfile)
+        fields = next(csvreader)
+        for row in csvreader:
+            rows.append(row)
+
+        numberRows = csvreader.line_num
+        print(numberRows)
+
+    currentFixation = np.array([])
     potentialFixation = np.array([])
-
-    print(f"calculated point\n{filterPoint(point)}")
-    print(f"current fixation:\n{currentFixation}")
-    print(f"potential fixation: \n{potentialFixation}")
-
-
+    points = []
+    point = np.array([float(row[0]), float(row[1])])
+    calculateFixationPoint(point)
+    for row in rows[0:50]:
+        point = np.array([float(row[0]), float(row[1])])
+        print(point)
+        print(f"current fixation:\n{currentFixation}")
+        print(f"potential fixation: \n{potentialFixation}")
+        filteredPoint = filterPoint(point)
+        print(f"calculated point\n{filteredPoint}")
+        points.append(filteredPoint)
+    del points[0]
+    with open("output.csv", "w") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(("x", "y"))
+        writer.writerows(points)
+        print(points)
 if __name__ == "__main__":
     main()
 # ----------------------------------------------------------------------------------------------------------------------
