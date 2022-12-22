@@ -24,8 +24,8 @@ def calculateFixationPoint(thisFixation):
     numerator = np.array([])
     denominator = np.array([])
     i = 0
+    # loop through, multiply each (x,y) set of points by the weighted multiplier
     for multiplier in range(1, (thisFixation.size//2)+1):
-        size = range(1,thisFixation.size//2)
         numerator = np.append(numerator, np.multiply(thisFixation[i], multiplier))
         numerator = np.append(numerator, np.multiply(thisFixation[i+1], multiplier))
         denominator = np.append(denominator, multiplier)
@@ -60,8 +60,8 @@ def addPoint(point, fixation):
     if fixation == "current":
         currentFixation= np.append(currentFixation, point)
         # If we have exceeded the window length, remove the oldest entries
-        #if currentFixation.size > (2*WINDOW_LENGTH):
-        #    currentFixation = currentFixation[0:4:1]
+        if currentFixation.size > (2*WINDOW_LENGTH):
+            currentFixation = currentFixation[-2*WINDOW_LENGTH::1]
     elif fixation == "potential":
         potentialFixation = np.append(point, potentialFixation)
     else:
@@ -122,7 +122,7 @@ def main():
     global currentFixation
     global potentialFixation
     point = [3, 4]
-    currentFixation = np.array([1, 2, 2, 3])
+    currentFixation = np.array([1, 2, 2, 3, 3,4])
     potentialFixation = np.array([])
 
     print(f"calculated point\n{filterPoint(point)}")
